@@ -1,33 +1,40 @@
 package me.miko.killcommand;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.jetbrains.annotations.NotNull;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.jspecify.annotations.NonNull;
 
 public class KillExecutor implements CommandExecutor {
+    private static final DamageSource KILL_DAMAGE_SOURCE = DamageSource.builder(DamageType.GENERIC_KILL).build();
+    private static final Component NO_PERMISSION_MESSAGE = Component.text(
+            "I'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.",
+            NamedTextColor.RED
+    );
+    private static final Component PLAYER_NOT_FOUND_MESSAGE = Component.text("Player not found.", NamedTextColor.RED);
 
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!hasPermission(sender, "KillCommand.kill") || (args.length > 0 && !hasPermission(sender, "KillCommand.kill.others"))) {
-            sender.sendMessage(ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.");
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String @NonNull [] args) {
+        if (!sender.hasPermission("KillCommand.kill") || (args.length > 0 && !sender.hasPermission("KillCommand.kill.others"))) {
+            sender.sendMessage(NO_PERMISSION_MESSAGE);
             return true;
         }
 
         Player player = (args.length == 0 && sender instanceof Player) ? (Player) sender : (args.length > 0 ? Bukkit.getPlayer(args[0]) : null);
         if (player == null) {
-            sender.sendMessage(ChatColor.RED + "Player not found.");
+            sender.sendMessage(PLAYER_NOT_FOUND_MESSAGE);
             return true;
         }
 
-        player.setLastDamageCause(new EntityDamageEvent(player, EntityDamageEvent.DamageCause.SUICIDE, Integer.MAX_VALUE));
-        player.setHealth(Double.MIN_VALUE);
+        player.damage(player.getHealth() + player.getAbsorptionAmount() + 1.0D, KILL_DAMAGE_SOURCE);
         return true;
-    }
-
-    private boolean hasPermission(CommandSender sender, String permission) {
-        return sender.hasPermission(permission);
     }
 }
