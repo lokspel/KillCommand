@@ -20,17 +20,18 @@ public class KillExecutor implements CommandExecutor {
             NamedTextColor.RED
     );
     private static final Component PLAYER_NOT_FOUND_MESSAGE = Component.text("Player not found.", NamedTextColor.RED);
+    private static final Component CONSOLE_USAGE_MESSAGE = Component.text("Specify a player when using this command from console.", NamedTextColor.RED);
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String @NonNull [] args) {
-        if (!sender.hasPermission("KillCommand.kill") || (args.length > 0 && !sender.hasPermission("KillCommand.kill.others"))) {
+        if (!sender.hasPermission("killcommand.kill") || (args.length > 0 && !sender.hasPermission("killcommand.kill.others"))) {
             sender.sendMessage(NO_PERMISSION_MESSAGE);
             return true;
         }
 
         Player player = (args.length == 0 && sender instanceof Player) ? (Player) sender : (args.length > 0 ? Bukkit.getPlayer(args[0]) : null);
         if (player == null) {
-            sender.sendMessage(PLAYER_NOT_FOUND_MESSAGE);
+            sender.sendMessage(args.length == 0 ? CONSOLE_USAGE_MESSAGE : PLAYER_NOT_FOUND_MESSAGE);
             return true;
         }
 

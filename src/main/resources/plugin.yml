@@ -10,9 +10,9 @@ commands:
       - suicide
     usage: /<command> [player]
 permissions:
-  KillCommand.kill:
+  killcommand.kill:
     description: Allows using /kill on yourself.
-    default: true
-  KillCommand.kill.others:
+    default: op
+  killcommand.kill.others:
     description: Allows using /kill on other players.
     default: op
