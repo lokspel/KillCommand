@@ -5,8 +5,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.damage.DamageSource;
-import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +17,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class KillExecutor implements CommandExecutor, TabCompleter {
-    private static final DamageSource KILL_DAMAGE_SOURCE = DamageSource.builder(DamageType.GENERIC_KILL).build();
     private static final Component NO_PERMISSION_MESSAGE = Component.text(
             "I'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.",
             NamedTextColor.RED
@@ -40,12 +37,12 @@ public class KillExecutor implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        player.damage(player.getHealth() + player.getAbsorptionAmount() + 1.0D, KILL_DAMAGE_SOURCE);
+        player.setHealth(0.0);
         return true;
     }
 
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String @NonNull [] args) {
         if (!sender.hasPermission("killcommand.kill.others")) {
             return Collections.emptyList();
         }
